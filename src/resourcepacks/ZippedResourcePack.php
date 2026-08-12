@@ -90,8 +90,6 @@ class ZippedResourcePack implements ResourcePack{
 			if($manifestIdx !== null){
 				$manifestData = $archive->getFromIndex($manifestIdx);
 				assert($manifestData !== false);
-			}elseif($archive->locateName("pack_manifest.json") !== false){
-				throw new ResourcePackException("Unsupported old pack format");
 			}else{
 				throw new ResourcePackException("manifest.json not found in the archive root");
 			}
