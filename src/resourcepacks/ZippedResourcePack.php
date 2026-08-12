@@ -125,11 +125,17 @@ class ZippedResourcePack implements ResourcePack{
 
 		$this->manifest = $manifest;
 
-		$this->fileResource = fopen($zipPath, "rb");
+		$fileResource = fopen($zipPath, "rb");
+		if($fileResource === false){
+			throw new ResourcePackException("Unable to open file for reading: $zipPath");
+		}
+		$this->fileResource = $fileResource;
 	}
 
 	public function __destruct(){
-		fclose($this->fileResource);
+		if(isset($this->fileResource)){
+			fclose($this->fileResource);
+		}
 	}
 
 	public function getPath() : string{
@@ -149,12 +155,20 @@ class ZippedResourcePack implements ResourcePack{
 	}
 
 	public function getPackSize() : int{
-		return filesize($this->path);
+		$size = filesize($this->path);
+		if($size === false){
+			throw new ResourcePackException("Unable to determine size of file: {$this->path}");
+		}
+		return $size;
 	}
 
 	public function getSha256(bool $cached = true) : string{
 		if($this->sha256 === null || !$cached){
-			$this->sha256 = hash_file("sha256", $this->path, true);
+			$hash = hash_file("sha256", $this->path, true);
+			if($hash === false){
+				throw new ResourcePackException("Unable to compute hash of file: {$this->path}");
+			}
+			$this->sha256 = $hash;
 		}
 		return $this->sha256;
 	}
